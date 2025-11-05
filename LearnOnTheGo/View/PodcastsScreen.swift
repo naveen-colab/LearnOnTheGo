@@ -7,15 +7,16 @@ struct PodcastsScreen: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Sticky red header
-                ZStack(alignment: .bottomLeading) {
+                ZStack(alignment: .bottom) {
                     Color(red: 0.92, green: 0.27, blue: 0.27)
-                        .frame(height: 96)
+                        .frame(height: 90)
+                    
                     Text("Podcasts")
-                        .font(.title2).bold()
+                        .font(.headline)
                         .foregroundStyle(.white)
-                        .padding(.horizontal, 16)
                         .padding(.bottom, 12)
                 }
+                .frame(maxWidth: .infinity)
                 .shadow(color: .black.opacity(0.08), radius: 6, x: 0, y: 4)
 
                 ScrollView {
@@ -31,7 +32,7 @@ struct PodcastsScreen: View {
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray4), lineWidth: 0.5))
 
                         // Keep Listening
-                        SectionRowHeader(title: "Keep listening", actionTitle: "See All")
+                        SectionRowHeader(title: "Keep listening", actionTitle: "")
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 14) {
                                 ForEach(MockPodcasts.keepListening) { item in
@@ -52,6 +53,7 @@ struct PodcastsScreen: View {
                     .padding(.vertical, 12)
                 }
             }
+            .ignoresSafeArea()
             .toolbar(.hidden, for: .navigationBar)
         }
     }
@@ -101,9 +103,10 @@ private struct PodcastCard: View {
     var body: some View {
         VStack(alignment: .center, spacing: 8) {
             // Artwork placeholder
-            RoundedRectangle(cornerRadius: 12)
-                .fill(LinearGradient(colors: [Color(.systemGray5), Color(.systemGray3)], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .frame(width: 240, height: 160)
+            Image("RecommendedImage1")
+                .resizable()
+                .cornerRadius(8)
+                .frame(width: 170, height: 130)
                 .overlay(
                     ZStack(alignment: .bottomLeading) {
                         // Title overlay for mock artwork look
@@ -136,6 +139,7 @@ private struct PodcastCard: View {
             }
             .frame(maxWidth: .infinity)
         }
+        .frame(width: 170, height: 216)
         .padding(12)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(.systemGray4), lineWidth: 0.5))

@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Image w-full h-full object-cover (1).png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
