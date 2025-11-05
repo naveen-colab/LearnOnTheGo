@@ -75,7 +75,7 @@ struct LearningCardSwipableView: View {
             // Force an opaque navigation bar (no translucency at scroll edge)
             .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(Color.red, for: .navigationBar)
-            .toolbarColorScheme(.light, for: .navigationBar)
+            .toolbarColorScheme(.none, for: .navigationBar)
             // Place a solid background under the nav bar so content never shows through
 //            .background(Color.white.ignoresSafeArea(edges: .top))
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -150,4 +150,3 @@ struct LearningCardSwipableView: View {
         LearningCardSwipableView(model: lm)
     }
 }
-

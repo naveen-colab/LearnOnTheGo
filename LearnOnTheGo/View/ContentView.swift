@@ -68,6 +68,68 @@ private struct DashboardTabView: View {
 }
 
 private struct HomeView: View {
+    enum Role: String, CaseIterable, Identifiable {
+        case developer = "Developer"
+        case operations = "Operations"
+        var id: String { rawValue }
+    }
+
+    // Role-specific content model
+    struct HomeContent {
+        struct Topic: Identifiable { let id = UUID(); let title: String; let symbol: String; let image: String }
+        let headerSubtitle: String
+        let recommended: [LearningCardModel]
+        let topics: [Topic]
+    }
+
+    // Provide content for each role
+    private var developerContent: HomeContent {
+        let card1 = LearningCardModel.defaultCard
+        let card2 = LearningCardModel(title: "Unlocking RAG", description: ": AI-Powered Knowledge Retrieval", imageName: "RecommendedImage2", learnCards: [])
+        return HomeContent(
+            headerSubtitle: "Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.",
+            recommended: [card1, card2],
+            topics: [
+                .init(title: "Cloud Computing", symbol: "cloud.fill", image: "TechTopic1"),
+                .init(title: "Agentic RAG", symbol: "atom", image: "TechTopic2")
+            ]
+        )
+    }
+
+    private var operationsContent: HomeContent {
+        let ops1 = LearningCardModel(title: "Credit Card Operations", description: "", imageName: "OperationsImage1", learnCards: [])
+        let ops2 = LearningCardModel(title: "Payments Systems", description: "", imageName: "OperationsImage2", learnCards: [])
+        return HomeContent(
+            headerSubtitle: "Personalized based on your current work",
+            recommended: [ops1, ops2],
+            topics: [
+                .init(title: "Compliance Norms", symbol: "shield.fill", image: "OpsTopic1"),
+                .init(title: "Risk & Controls", symbol: "magnifyingglass", image: "OpsTopic2")
+            ]
+        )
+    }
+
+    private func content(for role: Role) -> HomeContent {
+        switch role {
+        case .developer: return developerContent
+        case .operations: return operationsContent
+        }
+    }
+
+    @State private var currentRole: Role = .operations
+    @State private var showRolePicker: Bool = false
+    @State private var refreshToken: UUID = UUID()
+
+    private func select(role: Role) {
+        let roleChanged = currentRole != role
+        currentRole = role
+        showRolePicker = false
+        if roleChanged {
+            // Trigger a content refresh when role changes
+            refreshToken = UUID()
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -81,24 +143,28 @@ private struct HomeView: View {
                             .font(.title2).bold()
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                        HStack(spacing: 8) {
-                            Image(systemName: "person.crop.circle")
-                                .foregroundStyle(Color(red: 0.92, green: 0.27, blue: 0.27))
-                                .background(
-                                    Circle().fill(Color.white)
-                                )
+                        Button {
+                            showRolePicker = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "person.crop.circle")
+                                    .foregroundStyle(Color(red: 0.92, green: 0.27, blue: 0.27))
+                                    .background(
+                                        Circle().fill(Color.white)
+                                    )
 
-                            Text("Developer")
-                                .font(.subheadline).bold()
-                                .foregroundStyle(.white)
+                                Text(currentRole.rawValue)
+                                    .font(.subheadline).bold()
+                                    .foregroundStyle(.white)
+                            }
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.55))
+                            )
                         }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.white.opacity(0.55))
-                        )
-                        .foregroundStyle(Color(red: 0.92, green: 0.27, blue: 0.27))
+                        .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 16)
                     .padding(.bottom, 12)
@@ -108,34 +174,31 @@ private struct HomeView: View {
                 // Scrollable content below header
                 ScrollView {
                     VStack(spacing: 20) {
-                        // Recommended Learnings
+                        let data = content(for: currentRole)
                         VStack(alignment: .leading, spacing: 12) {
                             Text("Recommended Learnings")
                                 .font(.title3).bold()
                                 .foregroundStyle(.primary)
-                            Text("Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.")
+                            Text(data.headerSubtitle)
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
 
                             VStack(spacing: 16) {
-                                NavigationLink(value: LearningCardModel.defaultCard) {
-                                    LearningCard(model: LearningCardModel.defaultCard)
-                                }
-                                
-                                let card2 = LearningCardModel(title: "Unlocking RAG", description: ": AI-Powered Knowledge Retrieval", imageName: "RecommendedImage2", learnCards: [])
-                                NavigationLink(value: card2) {
-                                    LearningCard(model: card2)
+                                ForEach(Array(data.recommended.enumerated()), id: \.offset) { _, card in
+                                    NavigationLink(value: card) {
+                                        LearningCard(model: card)
+                                    }
                                 }
                             }
                         }
 
-                        // Tech Topics
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Tech Topics")
+                            Text("Topics")
                                 .font(.title3).bold()
                             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                                TopicCard(title: "Cloud Computing", symbol: "cloud.fill", image: "TechTopic1")
-                                TopicCard(title: "Agentic RAG", symbol: "atom", image: "TechTopic2")
+                                ForEach(data.topics) { topic in
+                                    TopicCard(title: topic.title, symbol: topic.symbol, image: topic.image)
+                                }
                             }
                         }
                     }
@@ -145,6 +208,14 @@ private struct HomeView: View {
                         LearningCardSwipableView(model: model)
                     }
                 }
+                .id(refreshToken)
+            }
+            .sheet(isPresented: $showRolePicker) {
+                RolePickerSheet(current: currentRole) { role in
+                    select(role: role)
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
             }
             .ignoresSafeArea(edges: .top) // let header hug the top
             .toolbar(.hidden, for: .navigationBar)
@@ -167,8 +238,6 @@ struct SectionHeader: View {
         }
     }
 }
-
-
 
 
 
@@ -244,9 +313,50 @@ struct SplashView: View {
     }
 }
 
+private struct RolePickerSheet: View {
+    let current: HomeView.Role
+    let onSelect: (HomeView.Role) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Choose Role")
+                .font(.headline)
+                .padding(.top)
+
+            ForEach(HomeView.Role.allCases) { role in
+                Button {
+                    onSelect(role)
+                } label: {
+                    HStack {
+                        Text(role.rawValue)
+                            .font(.body)
+                            .foregroundStyle(.primary)
+                        Spacer()
+                        if role == current {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                        }
+                    }
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(.systemGray6))
+                    )
+                }
+                .buttonStyle(.plain)
+            }
+
+            Spacer(minLength: 8)
+        }
+        .padding()
+        .presentationBackground(.ultraThinMaterial)
+    }
+}
+
 #Preview {
     ContentView()
 }
 #Preview {
     HomeView()
 }
+
