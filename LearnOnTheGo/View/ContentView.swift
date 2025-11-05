@@ -74,51 +74,36 @@ private struct HomeView: View {
         var id: String { rawValue }
     }
 
-    // Role-specific content model
-    struct HomeContent {
+    struct HomeContent: Identifiable {
         struct Topic: Identifiable { let id = UUID(); let title: String; let symbol: String; let image: String }
+        let id = UUID()
         let headerSubtitle: String
         let recommended: [LearningCardModel]
         let topics: [Topic]
     }
 
-    // Provide content for each role
-    private var developerContent: HomeContent {
-        let card1 = LearningCardModel.defaultCard
-        let card2 = LearningCardModel(title: "Unlocking RAG", description: ": AI-Powered Knowledge Retrieval", imageName: "RecommendedImage2", learnCards: [])
-        return HomeContent(
-            headerSubtitle: "Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.",
-            recommended: [card1, card2],
-            topics: [
-                .init(title: "Cloud Computing", symbol: "cloud.fill", image: "TechTopic1"),
-                .init(title: "Agentic RAG", symbol: "atom", image: "TechTopic2")
-            ]
-        )
-    }
-
-    private var operationsContent: HomeContent {
-        let ops1 = LearningCardModel(title: "Credit Card Operations", description: "", imageName: "OperationsImage1", learnCards: [])
-        let ops2 = LearningCardModel(title: "Payments Systems", description: "", imageName: "OperationsImage2", learnCards: [])
-        return HomeContent(
-            headerSubtitle: "Personalized based on your current work",
-            recommended: [ops1, ops2],
-            topics: [
-                .init(title: "Compliance Norms", symbol: "shield.fill", image: "OpsTopic1"),
-                .init(title: "Risk & Controls", symbol: "magnifyingglass", image: "OpsTopic2")
-            ]
-        )
-    }
-
-    private func content(for role: Role) -> HomeContent {
-        switch role {
-        case .developer: return developerContent
-        case .operations: return operationsContent
+    // Mapping from loader DTOs to UI models
+    private func mapContent(from dto: RoleContentDTO) -> HomeContent {
+        let cards: [LearningCardModel] = dto.recommended.map { item in
+            LearningCardModel(title: item.title, description: item.description, imageName: item.imageName, learnCards: [])
         }
+        let topics: [HomeContent.Topic] = dto.topics.map { t in
+            .init(title: t.title, symbol: t.symbol, image: t.image)
+        }
+        return HomeContent(headerSubtitle: dto.headerSubtitle, recommended: cards, topics: topics)
+    }
+
+    private func content(for role: Role) -> HomeContent? {
+        guard let dto = loadedRoles.first(where: { $0.role.caseInsensitiveCompare(role.rawValue) == .orderedSame }) else { return nil }
+        return mapContent(from: dto)
     }
 
     @State private var currentRole: Role = .operations
     @State private var showRolePicker: Bool = false
     @State private var refreshToken: UUID = UUID()
+
+    @State private var loadedRoles: [RoleContentDTO] = []
+    @State private var loadError: String? = nil
 
     private func select(role: Role) {
         let roleChanged = currentRole != role
@@ -174,32 +159,39 @@ private struct HomeView: View {
                 // Scrollable content below header
                 ScrollView {
                     VStack(spacing: 20) {
-                        let data = content(for: currentRole)
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Recommended Learnings")
-                                .font(.title3).bold()
-                                .foregroundStyle(.primary)
-                            Text(data.headerSubtitle)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                        if let data = content(for: currentRole) {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Recommended Learnings")
+                                    .font(.title3).bold()
+                                    .foregroundStyle(.primary)
+                                Text(data.headerSubtitle)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
 
-                            VStack(spacing: 16) {
-                                ForEach(Array(data.recommended.enumerated()), id: \.offset) { _, card in
-                                    NavigationLink(value: card) {
-                                        LearningCard(model: card)
+                                VStack(spacing: 16) {
+                                    ForEach(Array(data.recommended.enumerated()), id: \.offset) { _, card in
+                                        NavigationLink(value: card) {
+                                            LearningCard(model: card)
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Topics")
-                                .font(.title3).bold()
-                            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                                ForEach(data.topics) { topic in
-                                    TopicCard(title: topic.title, symbol: topic.symbol, image: topic.image)
+                            VStack(alignment: .leading, spacing: 12) {
+                                Text("Topics")
+                                    .font(.title3).bold()
+                                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                                    ForEach(data.topics) { topic in
+                                        TopicCard(title: topic.title, symbol: topic.symbol, image: topic.image)
+                                    }
                                 }
                             }
+                        } else {
+                            VStack(spacing: 12) {
+                                if let loadError { Text("Failed to load content: \(loadError)").font(.footnote).foregroundStyle(.secondary) }
+                                ProgressView("Loading content…")
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
                         }
                     }
                     .padding(.horizontal)
@@ -219,6 +211,14 @@ private struct HomeView: View {
             }
             .ignoresSafeArea(edges: .top) // let header hug the top
             .toolbar(.hidden, for: .navigationBar)
+        }
+        .task {
+            do {
+                let payload = try RoleContentLoader.shared.loadRoles()
+                loadedRoles = payload.roles
+            } catch {
+                loadError = String(describing: error)
+            }
         }
     }
 }
@@ -359,4 +359,3 @@ private struct RolePickerSheet: View {
 #Preview {
     HomeView()
 }
-

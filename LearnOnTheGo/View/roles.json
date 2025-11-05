@@ -1,0 +1,48 @@
+{
+  "roles": [
+    {
+      "role": "Developer",
+      "headerSubtitle": "Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.",
+      "recommended": [
+        {
+          "title": "Intro to LLMs",
+          "description": "Foundations and practical use-cases",
+          "imageName": "RecommendedImage1",
+          "learnCards": []
+        },
+        {
+          "title": "Unlocking RAG",
+          "description": ": AI-Powered Knowledge Retrieval",
+          "imageName": "RecommendedImage2",
+          "learnCards": []
+        }
+      ],
+      "topics": [
+        { "title": "Cloud Computing", "symbol": "cloud.fill", "image": "TechTopic1" },
+        { "title": "Agentic RAG", "symbol": "atom", "image": "TechTopic2" }
+      ]
+    },
+    {
+      "role": "Operations",
+      "headerSubtitle": "Personalized based on your current work",
+      "recommended": [
+        {
+          "title": "Credit Card Operations",
+          "description": "",
+          "imageName": "OperationsImage1",
+          "learnCards": []
+        },
+        {
+          "title": "Payments Systems",
+          "description": "",
+          "imageName": "OperationsImage2",
+          "learnCards": []
+        }
+      ],
+      "topics": [
+        { "title": "Compliance Norms", "symbol": "shield.fill", "image": "OpsTopic1" },
+        { "title": "Risk & Controls", "symbol": "magnifyingglass", "image": "OpsTopic2" }
+      ]
+    }
+  ]
+}
