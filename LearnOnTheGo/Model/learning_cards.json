@@ -1,0 +1,69 @@
+[
+    {
+        "Resume Learning": [
+            {
+                "title": "Frontend Frameworks",
+                "description": "Build Reliable Infrastructure",
+                "imageName": "resumeLearning1"
+            },
+            {
+                "title": "Cybersecurity",
+                "description": "Build Reliable Infrastructure",
+                "imageName": "resumeLearning2"
+            }
+        ]
+    },
+    {
+        "Bookmarked": [
+            {
+                "title": "Mobile App Dev",
+                "description": "Build Reliable Infrastructure",
+                "imageName": "bookmarked1"
+            },
+            {
+                "title": "Data Engineering",
+                "description": "Build Reliable Infrastructure",
+                "imageName": "bookmarked2"
+            },
+            {
+                "title": "Agentic",
+                "description": "Build Reliable Infrastructure",
+                "imageName": "bookmarked3"
+            }
+        ]
+    },
+    {
+        "Topics": [
+            {
+                "title": "Agentic AI",
+                "description": "Building Agentic AI frameworks",
+                "imageName": "topics1"
+            },
+            {
+                "title": "Generative AI & LLMs",
+                "description": "Understand how LLMs generate new content",
+                "imageName": "topics2"
+            },
+            {
+                "title": "Containerization",
+                "description": "Using Docker, Kubernetes, and automation tools.",
+                "imageName": "topics3"
+            },
+            {
+                "title": "Cybersecurity",
+                "description": "Securing code and handling vulnerabilities.",
+                "imageName": "topics4"
+            },
+            {
+                "title": "Mobile App Development",
+                "description": "Building responsive, cross-platform mobile apps.",
+                "imageName": "topics5"
+            },
+            {
+                "title": "Data Engineering & Analytics",
+                "description": "Managing and visualizing big data.",
+                "imageName": "topics6"
+            }
+        ]
+    }
+]

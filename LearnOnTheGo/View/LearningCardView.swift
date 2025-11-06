@@ -63,7 +63,7 @@ struct LearningCard: View {
                 }
 
                 NavigationLink {
-                    PlayLearningCardScreen(model: LearningCardModel.defaultCard)
+                    PlayLearningCardScreen(model: model)
                 } label: {
                     Image(systemName: "dot.radiowaves.left.and.right")
                         .font(.headline)
@@ -111,5 +111,6 @@ struct TopicCard: View {
 }
 
 #Preview {
-    LearningCard(model: LearningCardModel.defaultCard)
+    LearningCard(model: LearningCardModel(id: UUID(), title: "", description: "", imageName: "", learnCards: [LearnCard]()))
 }
+

@@ -5,16 +5,41 @@
       "headerSubtitle": "Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.",
       "recommended": [
         {
-          "title": "Intro to LLMs",
-          "description": "Foundations and practical use-cases",
+          "title": "Mastering MCP Servers",
+          "description": "Build Reliable Infrastructure",
           "imageName": "RecommendedImage1",
-          "learnCards": []
+          "learnCards": [
+              {
+                "title": "Meet RAG: AI's Smartest Upgrade",
+                "content": "Retrieval-Augmented Generation (RAG) combines two AI skills — retrieval (finding facts) and generation (creating answers).\n\nIt fetches the latest info before writing, keeping responses fresh, accurate, and relevant.",
+                "isViewed": false
+              },
+              {
+                "title": "How RAG Works in 3 Steps",
+                "content": "Your Question → You ask something.\nFact Hunt → RAG searches databases, articles, or documents.\nSmart Answer → AI weaves the facts into a tailored, natural-sounding reply.\n\nThink of it as asking a librarian who also happens to be a skilled writer!",
+                "isViewed": false
+              },
+              {
+                "title": "Why RAG Beats Plain AI",
+                "content": "Without retrieval, AI relies only on what it was trained on — which can be stale.\nWith RAG, you get:\n * Up-to-date info\n * Reduced hallucinations (AI making stuff up)\n * Higher accuracy for decision-making.\n * It’s like GPS navigation that always checks live traffic before giving you directions.",
+                "isViewed": false
+              },
+              {
+                "title": "Where RAG Shines",
+                "content": "RAG is perfect for:\n * Research & reports\n * Customer support\n * Legal & compliance queries\n * Medical info lookup\n * Basically, anywhere accuracy and context matter most.",
+                "isViewed": false
+              },
+              {
+                "title": "The Bottom Line",
+                "content": "RAG = AI with a fact-checker in its pocket.\n\nBy fetching real-time info before answering, it delivers responses that are factual, current, and relevant — so you can trust what you read.",
+                "isViewed": false
+              }
+          ]
         },
         {
           "title": "Unlocking RAG",
           "description": ": AI-Powered Knowledge Retrieval",
-          "imageName": "RecommendedImage2",
-          "learnCards": []
+          "imageName": "RecommendedImage2"
         }
       ],
       "topics": [
@@ -30,13 +55,38 @@
           "title": "Credit Card Operations",
           "description": "",
           "imageName": "OperationsImage1",
-          "learnCards": []
+          "learnCards": [
+              {
+                "title": "Application Review & Approval",
+                "content": "Banks assess an applicant’s credit history, income, and identity before issuing a card.\n\nKey check: KYC (Know Your Customer) ensures legal compliance and fraud prevention.\n\nAdvanced fraud detection tools may flag high-risk applications for manual review.",
+                "isViewed": false
+              },
+              {
+                "title": "Setting the Credit Limit",
+                "content": "A customer’s credit score and repayment capacity determine their limit.\n\nHigher limits may require additional verification or secured deposits.\n\nLimits are periodically reviewed and adjusted based on usage and payment behavior.",
+                "isViewed": false
+              },
+              {
+                "title": "Approving Purchases in Real Time",
+                "content": "Each transaction is routed through the payment network to verify funds, available credit, and potential fraud flags — all within seconds.\n\nGeo-location checks and spending pattern analysis help detect unusual activity.",
+                "isViewed": false
+              },
+              {
+                "title": "Monthly Statements & Due Dates",
+                "content": "Banks send detailed statements showing purchases, fees, and the minimum amount due.\n\nTimely payment avoids interest charges and late fees.\n\nDigital delivery through apps and email helps customers track spending in real time.",
+                "isViewed": false
+              },
+              {
+                "title": "Handling Customer Disputes",
+                "content": "If a customer reports an unauthorized charge, the bank investigates, issues a temporary credit, and works with the merchant to resolve the case.\n\nResolution timelines vary by network but typically range from 30–90 days.",
+                "isViewed": false
+              }
+            ]
         },
         {
           "title": "Payments Systems",
           "description": "",
-          "imageName": "OperationsImage2",
-          "learnCards": []
+          "imageName": "OperationsImage2"
         }
       ],
       "topics": [

@@ -7,8 +7,9 @@
 
 import Foundation
 
-struct LearningCardModel: Identifiable, Hashable {
-    let id = UUID()
+// Model now conforms to Codable and data is loaded from JSON
+struct LearningCardModel: Identifiable, Hashable, Codable {
+    let id: UUID
     let title: String
     let description: String
     let imageName: String
@@ -21,65 +22,13 @@ struct LearningCardModel: Identifiable, Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
-    static var defaultCard: LearningCardModel {
-        
-        let content = """
-        Retrieval-Augmented Generation (RAG) combines two AI skills — retrieval (finding facts) and generation (creating answers).
-        It fetches the latest info before writing, keeping responses fresh, accurate, and relevant.
-        """
-        let content2 = """
-        Your Question → You ask something.
-        Fact Hunt → RAG searches databases, articles, or documents.
-        Smart Answer → AI weaves the facts into a tailored, natural-sounding reply.
-        
-        Think of it as asking a librarian who also happens to be a skilled writer!
-        """
-        let content3 = """
-        Without retrieval, AI relies only on what it was trained on — which can be stale.
-        With RAG, you get:
-        Up-to-date info
-        Reduced hallucinations (AI making stuff up)
-        Higher accuracy for decision-making.
-        It’s like GPS navigation that always checks live traffic before giving you directions.
-        """
-        
-        let content4 = """
-            RAG is perfect for:
-                        -> Research & reports
-                        -> Customer support
-                        -> Legal & compliance queries
-                        -> Medical info lookup
-                        -> Basically, anywhere accuracy and context matter most.
-            """
-        
-        let content5 = """
-            RAG = AI with a fact-checker in its pocket.
-            
-            By fetching real-time info before answering, it delivers responses that are factual, current, and relevant — so you can trust what you read.
-            """
-        
-        let cards = [
-            LearnCard(title: "Meet RAG: AI's Smartest Upgrade", content: content, isViewed: false),
-            LearnCard(title: "How RAG Works in 3 Steps", content: content2, isViewed: false),
-            LearnCard(title: "Why RAG Beats Plain AI", content: content3, isViewed: false),
-            LearnCard(title: "Where RAG Shines", content: content4, isViewed: false),
-            LearnCard(title: "The Bottom Line", content: content5, isViewed: false)
-            
-        ]
-        
-        return LearningCardModel(title: "Mastering MCP Servers",
-                          description: "Build Reliable Infrastructure",
-                          imageName: "RecommendedImage1",
-                          learnCards: cards)
-    }
 }
 
-struct LearnCard: Hashable {
+struct LearnCard: Hashable, Codable {
     let title: String
     let content: String
     var isViewed: Bool
-    
+
     mutating func updateView(_ value: Bool) {
         isViewed = value
     }
@@ -90,4 +39,77 @@ struct LearningCardProgressModel {
     let currentIndex: Int
     let totalCount: Int
     let title: String
+}
+
+struct LearningCardDataLoader {
+    static func load(fromFile fileName: String = "learning_cards", withExtension ext: String = "json") -> [LearningCardModel] {
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: ext) else {
+            #if DEBUG
+            print("[LearningCardDataLoader] Missing JSON resource: \(fileName).\(ext)")
+            #endif
+            return []
+        }
+        do {
+            let data = try Data(contentsOf: url)
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .useDefaultKeys
+            return try decoder.decode([LearningCardModel].self, from: data)
+        } catch {
+            #if DEBUG
+            print("[LearningCardDataLoader] Failed to decode JSON: \(error)")
+            #endif
+            return []
+        }
+    }
+}
+
+
+// MARK: - Card Model
+struct ExploreCard: Identifiable, Codable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let imageName: String
+
+    enum CodingKeys: String, CodingKey {
+        case title
+        case description
+        case imageName
+    }
+}
+
+// MARK: - Learning Cards Container
+struct ExploreLearningCardsData: Codable {
+    let resumeLearning: [ExploreCard]
+    let bookmarked: [ExploreCard]
+    let topics: [ExploreCard]
+
+    enum CodingKeys: String, CodingKey {
+        case resumeLearning = "resumeLearning"
+        case bookmarked = "Bookmarked"
+        case topics = "Topics"
+    }
+}
+
+// MARK: - Sample Data
+extension ExploreLearningCardsData {
+    static let sample = ExploreLearningCardsData(
+        resumeLearning: [
+            ExploreCard(title: "Frontend Frameworks", description: "Build Reliable Infrastructure", imageName: "resumeLearning1"),
+            ExploreCard(title: "Cybersecurity", description: "Build Reliable Infrastructure", imageName: "resumeLearning2")
+        ],
+        bookmarked: [
+            ExploreCard(title: "Mobile App Dev", description: "Build Reliable Infrastructure", imageName: "bookmarked1"),
+            ExploreCard(title: "Data Engineering", description: "Build Reliable Infrastructure", imageName: "bookmarked2"),
+            ExploreCard(title: "Agentic", description: "Build Reliable Infrastructure", imageName: "bookmarked3")
+        ],
+        topics: [
+            ExploreCard(title: "Agentic AI", description: "Building Agentic AI framewors", imageName: "topics1"),
+            ExploreCard(title: "Generative AI & LLMs", description: "Understand how LLMs generate new content", imageName: "topics2"),
+            ExploreCard(title: "Containerization", description: "Using Docker, Kubernetes, and automation tools.", imageName: "topics3"),
+            ExploreCard(title: "Cybersecurity", description: "Securing code and handling vulnerabilities.", imageName: "topics4"),
+            ExploreCard(title: "Mobile App Development", description: "Building responsive, cross-platform mobile apps.", imageName: "topics5"),
+            ExploreCard(title: "Data Engineering & Analytics", description: "Managing and visualizing big data.", imageName: "topics6")
+        ]
+    )
 }

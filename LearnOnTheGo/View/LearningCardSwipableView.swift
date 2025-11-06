@@ -146,7 +146,7 @@ struct LearningCardSwipableView: View {
             LearnCard(title: "Why vectors?", content: content2, isViewed: false),
             LearnCard(title: "Prompts that work", content: content3, isViewed: false)
         ]
-        let lm = LearningCardModel(title: "RAG", description: "RAG", imageName: "", learnCards: cards)
+        let lm = LearningCardModel(id: UUID(), title: "RAG", description: "RAG", imageName: "", learnCards: cards)
         LearningCardSwipableView(model: lm)
     }
 }

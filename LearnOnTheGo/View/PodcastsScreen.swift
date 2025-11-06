@@ -101,12 +101,12 @@ private struct PodcastCard: View {
     let size: Size
 
     var body: some View {
-        VStack(alignment: .center, spacing: 8) {
-            // Artwork placeholder
-            Image("RecommendedImage1")
+        VStack {
+            Image(item.image)
                 .resizable()
                 .cornerRadius(8)
                 .frame(width: 170, height: 130)
+                .scaledToFill()
                 .overlay(
                     ZStack(alignment: .bottomLeading) {
                         // Title overlay for mock artwork look
@@ -120,27 +120,29 @@ private struct PodcastCard: View {
                         }
                     }
                 )
-
-            // Metadata
-            Text(item.title)
-                .font(.subheadline).bold()
-                .foregroundStyle(.primary)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
-            HStack {
-                Text(item.duration)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Circle()
-                    .fill(Color(red: 1.0, green: 0.92, blue: 0.92))
-                    .frame(width: 40, height: 40)
-                    .overlay(Image(systemName: "play.fill").foregroundStyle(Color(red: 0.92, green: 0.27, blue: 0.27)))
+            VStack(alignment: .center, spacing: 8) {
+                // Artwork placeholder
+                // Metadata
+                Text(item.title)
+                    .font(.subheadline).bold()
+                    .foregroundStyle(.primary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.center)
+                HStack {
+                    Text(item.duration)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Spacer()
+                    Circle()
+                        .fill(Color(red: 1.0, green: 0.92, blue: 0.92))
+                        .frame(width: 40, height: 40)
+                        .overlay(Image(systemName: "play.fill").foregroundStyle(Color(red: 0.92, green: 0.27, blue: 0.27)))
+                }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
+//            .frame(width: 170, height: 216)
+            .padding(12)
         }
-        .frame(width: 170, height: 216)
-        .padding(12)
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color(.systemGray4), lineWidth: 0.5))
         .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 4)
@@ -154,42 +156,43 @@ private struct PodcastItem: Identifiable {
     let artworkTitle: String
     let title: String
     let duration: String
+    let image: String
 }
 
 private enum MockPodcasts {
     static let keepListening: [PodcastItem] = [
-        .init(artworkTitle: "AI Today", title: "AI Today Podcast", duration: "15 min left"),
-        .init(artworkTitle: "Cyber security", title: "Cyber security", duration: "15 min left")
+        .init(artworkTitle: "AI Today", title: "AI Today Podcast", duration: "15 min left", image: "keepListening1"),
+        .init(artworkTitle: "Cyber security", title: "Cyber security", duration: "15 min left", image: "keepListening2")
     ]
 
     static let ai: [PodcastItem] = [
-        .init(artworkTitle: "The Rise", title: "The Rise of Generative AI", duration: "12 min"),
-        .init(artworkTitle: "LLMs", title: "LLMs in Real World Apps", duration: "18 min"),
-        .init(artworkTitle: "Ethics", title: "Ethical AI Decision Making", duration: "15 min")
+        .init(artworkTitle: "The Rise", title: "The Rise of Generative AI", duration: "12 min", image: "LLM1"),
+        .init(artworkTitle: "LLMs", title: "LLMs in Real World Apps", duration: "18 min", image: "LLM1"),
+        .init(artworkTitle: "Ethics", title: "Ethical AI Decision Making", duration: "15 min", image: "LLM3")
     ]
 
     static let security: [PodcastItem] = [
-        .init(artworkTitle: "Zero Trust", title: "Zero Trust Explained", duration: "10 min"),
-        .init(artworkTitle: "Hacks 2025", title: "Biggest Hacks of 2025", duration: "20 min"),
-        .init(artworkTitle: "Infra", title: "Secure Infra Basics", duration: "18 min")
+        .init(artworkTitle: "Zero Trust", title: "Zero Trust Explained", duration: "10 min", image: "Cybersecurity1"),
+        .init(artworkTitle: "Hacks 2025", title: "Biggest Hacks of 2025", duration: "20 min", image: "Cybersecurity2"),
+        .init(artworkTitle: "Infra", title: "Secure Infra Basics", duration: "18 min", image: "Cybersecurity3")
     ]
 
     static let data: [PodcastItem] = [
-        .init(artworkTitle: "ETL", title: "ETL vs ELT in Modern Data Stacks", duration: "16 min"),
-        .init(artworkTitle: "Pipelines", title: "Real-time Data Pipelines", duration: "12 min"),
-        .init(artworkTitle: "Big Data", title: "Big Data Trends", duration: "18 min")
+        .init(artworkTitle: "ETL", title: "ETL vs ELT in Modern Data Stacks", duration: "16 min", image: "Data1"),
+        .init(artworkTitle: "Pipelines", title: "Real-time Data Pipelines", duration: "12 min", image: "Data2"),
+        .init(artworkTitle: "Big Data", title: "Big Data Trends", duration: "18 min", image: "Data3")
     ]
 
     static let cloud: [PodcastItem] = [
-        .init(artworkTitle: "K8s", title: "Kubernetes Demystified", duration: "17 min"),
-        .init(artworkTitle: "Serverless", title: "Serverless Architectures", duration: "18 min"),
-        .init(artworkTitle: "Cost", title: "Cloud Cost Optimization", duration: "18 min")
+        .init(artworkTitle: "K8s", title: "Kubernetes Demystified", duration: "17 min", image: "cloud1"),
+        .init(artworkTitle: "Serverless", title: "Serverless Architectures", duration: "18 min", image: "cloud2"),
+        .init(artworkTitle: "Cost", title: "Cloud Cost Optimization", duration: "18 min", image: "cloud3")
     ]
 
     static let mobile: [PodcastItem] = [
-        .init(artworkTitle: "Trends", title: "Trends in iOS Development", duration: "14 min"),
-        .init(artworkTitle: "React Native", title: "Flutter vs React Native", duration: "18 min"),
-        .init(artworkTitle: "Essentials", title: "Mobile Dev Essentials", duration: "20 min")
+        .init(artworkTitle: "Trends", title: "Trends in iOS Development", duration: "14 min", image: "mobile1"),
+        .init(artworkTitle: "React Native", title: "Flutter vs React Native", duration: "18 min", image: "mobile1"),
+        .init(artworkTitle: "Essentials", title: "Mobile Dev Essentials", duration: "20 min", image: "mobile1")
     ]
 }
 

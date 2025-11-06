@@ -84,21 +84,38 @@ private struct HomeView: View {
 
     // Mapping from loader DTOs to UI models
     private func mapContent(from dto: RoleContentDTO) -> HomeContent {
-        let cards: [LearningCardModel] = dto.recommended.map { item in
-            LearningCardModel(title: item.title, description: item.description, imageName: item.imageName, learnCards: [])
+        // Use explicit defaults with concrete element types so the compiler can infer correctly
+        let cardsDTO: [LearningCardDTO] = dto.recommended ?? [LearningCardDTO]()
+        let cards: [LearningCardModel] = cardsDTO.map { item in
+            let learnCardTitles: [LearnCard] = item.learnCards ?? [LearnCard]()
+//            let learnCards: [LearnCard] = learnCardTitles.map { LearnCard(title: $0, content: "", isViewed: false) }
+            return LearningCardModel(
+                id: UUID(),
+                title: item.title ?? "",
+                description: item.description ?? "",
+                imageName: item.imageName ?? "",
+                learnCards: learnCardTitles
+            )
         }
-        let topics: [HomeContent.Topic] = dto.topics.map { t in
-            .init(title: t.title, symbol: t.symbol, image: t.image)
+
+        let topicsDTO: [TopicDTO] = dto.topics ?? [TopicDTO]()
+        let topics: [HomeContent.Topic] = topicsDTO.map { t in
+            HomeContent.Topic(title: t.title ?? "", symbol: t.symbol ?? "", image: t.image ?? "")
         }
-        return HomeContent(headerSubtitle: dto.headerSubtitle, recommended: cards, topics: topics)
+
+        return HomeContent(
+            headerSubtitle: dto.headerSubtitle ?? "",
+            recommended: cards,
+            topics: topics
+        )
     }
 
     private func content(for role: Role) -> HomeContent? {
-        guard let dto = loadedRoles.first(where: { $0.role.caseInsensitiveCompare(role.rawValue) == .orderedSame }) else { return nil }
+        guard let dto = loadedRoles.first(where: { ($0.role ?? "").caseInsensitiveCompare(role.rawValue) == .orderedSame }) else { return nil }
         return mapContent(from: dto)
     }
 
-    @State private var currentRole: Role = .operations
+    @State private var currentRole: Role = .developer
     @State private var showRolePicker: Bool = false
     @State private var refreshToken: UUID = UUID()
 
@@ -215,7 +232,7 @@ private struct HomeView: View {
         .task {
             do {
                 let payload = try RoleContentLoader.shared.loadRoles()
-                loadedRoles = payload.roles
+                loadedRoles = payload.roles ?? []
             } catch {
                 loadError = String(describing: error)
             }
@@ -359,3 +376,4 @@ private struct RolePickerSheet: View {
 #Preview {
     HomeView()
 }
+

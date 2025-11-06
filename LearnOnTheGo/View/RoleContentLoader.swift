@@ -3,28 +3,27 @@ import Foundation
 // Mirror the existing LearningCardModel shape used in the UI. We assume it already exists in the project.
 // To decode from JSON, we define a minimal Decodable projection that can convert into LearningCardModel.
 struct LearningCardDTO: Decodable {
-    let title: String
-    let description: String
-    let imageName: String
-    let learnCards: [String]
+    let title: String?
+    let description: String?
+    let imageName: String?
+    let learnCards: [LearnCard]?
 }
 
-struct TopicDTO: Decodable, Identifiable {
-    let id = UUID()
-    let title: String
-    let symbol: String
-    let image: String
+struct TopicDTO: Decodable {
+    let title: String?
+    let symbol: String?
+    let image: String?
 }
 
 struct RoleContentDTO: Decodable {
-    let role: String
-    let headerSubtitle: String
-    let recommended: [LearningCardDTO]
-    let topics: [TopicDTO]
+    let role: String?
+    let headerSubtitle: String?
+    let recommended: [LearningCardDTO]?
+    let topics: [TopicDTO]?
 }
 
 struct RolesPayload: Decodable {
-    let roles: [RoleContentDTO]
+    let roles: [RoleContentDTO]?
 }
 
 enum RoleContentLoaderError: Error {

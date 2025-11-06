@@ -325,7 +325,7 @@ private final class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
 #Preview {
     
     NavigationStack {
-        PlayLearningCardScreen(model: LearningCardModel.defaultCard)
+        PlayLearningCardScreen(model: LearningCardModel(id: UUID(), title: "", description: "", imageName: "", learnCards: [LearnCard]()))
     }
 }
 
