@@ -6,8 +6,20 @@
 //
 
 import SwiftUI
+internal import Combine
+
+final class RoleStore: ObservableObject {
+    @Published var current: Role = .developer
+}
+
+enum Role: String, CaseIterable, Identifiable {
+    case developer = "Developer"
+    case operations = "Operations"
+    var id: String { rawValue }
+}
 
 struct ContentView: View {
+    @StateObject private var roleStore = RoleStore()
     @State private var showSplash = true
 
     var body: some View {
@@ -19,6 +31,7 @@ struct ContentView: View {
                     .transition(.opacity)
             }
         }
+        .environmentObject(roleStore)
         .onAppear {
             // Simulate a short loading period; adjust to match your Figma timing.
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -31,6 +44,7 @@ struct ContentView: View {
 }
 
 private struct DashboardTabView: View {
+    @EnvironmentObject private var roleStore: RoleStore
     @State private var selectedTab: Int = 0
 
     var body: some View {
@@ -68,11 +82,7 @@ private struct DashboardTabView: View {
 }
 
 private struct HomeView: View {
-    enum Role: String, CaseIterable, Identifiable {
-        case developer = "Developer"
-        case operations = "Operations"
-        var id: String { rawValue }
-    }
+    @EnvironmentObject private var roleStore: RoleStore
 
     struct HomeContent: Identifiable {
         struct Topic: Identifiable { let id = UUID(); let title: String; let symbol: String; let image: String }
@@ -88,7 +98,6 @@ private struct HomeView: View {
         let cardsDTO: [LearningCardDTO] = dto.recommended ?? [LearningCardDTO]()
         let cards: [LearningCardModel] = cardsDTO.map { item in
             let learnCardTitles: [LearnCard] = item.learnCards ?? [LearnCard]()
-//            let learnCards: [LearnCard] = learnCardTitles.map { LearnCard(title: $0, content: "", isViewed: false) }
             return LearningCardModel(
                 id: UUID(),
                 title: item.title ?? "",
@@ -115,7 +124,6 @@ private struct HomeView: View {
         return mapContent(from: dto)
     }
 
-    @State private var currentRole: Role = .developer
     @State private var showRolePicker: Bool = false
     @State private var refreshToken: UUID = UUID()
 
@@ -123,8 +131,8 @@ private struct HomeView: View {
     @State private var loadError: String? = nil
 
     private func select(role: Role) {
-        let roleChanged = currentRole != role
-        currentRole = role
+        let roleChanged = roleStore.current != role
+        roleStore.current = role
         showRolePicker = false
         if roleChanged {
             // Trigger a content refresh when role changes
@@ -155,7 +163,7 @@ private struct HomeView: View {
                                         Circle().fill(Color.white)
                                     )
 
-                                Text(currentRole.rawValue)
+                                Text(roleStore.current.rawValue)
                                     .font(.subheadline).bold()
                                     .foregroundStyle(.white)
                             }
@@ -176,7 +184,7 @@ private struct HomeView: View {
                 // Scrollable content below header
                 ScrollView {
                     VStack(spacing: 20) {
-                        if let data = content(for: currentRole) {
+                        if let data = content(for: roleStore.current) {
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Recommended Learnings")
                                     .font(.title3).bold()
@@ -220,7 +228,7 @@ private struct HomeView: View {
                 .id(refreshToken)
             }
             .sheet(isPresented: $showRolePicker) {
-                RolePickerSheet(current: currentRole) { role in
+                RolePickerSheet(current: roleStore.current) { role in
                     select(role: role)
                 }
                 .presentationDetents([.medium, .large])
@@ -331,8 +339,8 @@ struct SplashView: View {
 }
 
 private struct RolePickerSheet: View {
-    let current: HomeView.Role
-    let onSelect: (HomeView.Role) -> Void
+    let current: Role
+    let onSelect: (Role) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -340,7 +348,7 @@ private struct RolePickerSheet: View {
                 .font(.headline)
                 .padding(.top)
 
-            ForEach(HomeView.Role.allCases) { role in
+            ForEach(Role.allCases) { role in
                 Button {
                     onSelect(role)
                 } label: {
@@ -372,8 +380,10 @@ private struct RolePickerSheet: View {
 
 #Preview {
     ContentView()
+        .environmentObject(RoleStore())
 }
 #Preview {
     HomeView()
+        .environmentObject(RoleStore())
 }
 

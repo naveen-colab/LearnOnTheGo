@@ -11,7 +11,7 @@ struct LearningCardSwipableView: View {
     var model: LearningCardModel
     @State private var currentIndex: Int = 0 {
         didSet {
-            print("Tester: currentIndex is now \(currentIndex)")
+//            print("Tester: currentIndex is now \(currentIndex)")
         }
     }
     @State private var dragOffset: CGFloat = 0

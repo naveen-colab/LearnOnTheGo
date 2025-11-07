@@ -1,16 +1,84 @@
 [
     {
         "Resume Learning": [
-            {
-                "title": "Frontend Frameworks",
-                "description": "Build Reliable Infrastructure",
-                "imageName": "resumeLearning1"
-            },
-            {
-                "title": "Cybersecurity",
-                "description": "Build Reliable Infrastructure",
-                "imageName": "resumeLearning2"
-            }
+            [
+              {
+                "id": "6C0D5F9A-9F00-4BAE-9D0C-01B48F5E3B6A",
+                "title": "Microservices",
+                "description": "Learn the basics of microservices",
+                "imageName": "microservices",
+                "learnCard": [
+                  {
+                    "title": "What Are Microservices?",
+                    "content": "Microservice architecture structures an application as a collection of small, independent services...",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Monolithic vs. Microservices",
+                    "content": "Monolithic applications bundle all features into a single codebase...",
+                    "isViewed": false
+                  }
+                ]
+              },
+              {
+                "id": "6C0D5F9A-9F00-4BAE-9D0C-01B48F5E3B6A",
+                "title": "Containerization",
+                "description": "Docker and Kubernetes basics",
+                "imageName": "containers",
+                "learnCards": [
+                  {
+                    "title": "What Are Payment Systems?",
+                    "content": "Payment systems are networks and processes that enable the transfer of money between individuals, businesses, and financial institutions.\n\nThey form the backbone of banking operations — ensuring secure, timely, and traceable settlement of funds.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Types of Payment Systems",
+                    "content": "Banking operations rely on multiple payment rails:\n * RTGS: Real-time settlement for high-value transactions.\n * NEFT: Batch-based fund transfers processed in half-hourly cycles.\n * IMPS: Instant 24x7 retail transfers.\n * UPI: Unified Payments Interface for mobile and QR-based instant payments.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "RTGS – Real Time Gross Settlement",
+                    "content": "Used for large-value transfers (≥ ₹2 lakh) settled instantly on a one-to-one basis.\n\nRTGS ensures final and irrevocable settlement, typically used by corporates, banks, and institutions for high-value clearing.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "NEFT – National Electronic Funds Transfer",
+                    "content": "NEFT operates on a deferred net settlement model, processing transactions in batches every 30 minutes.\n\nIt’s ideal for retail and business payments where instant settlement isn’t critical.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "IMPS – Immediate Payment Service",
+                    "content": "IMPS provides instant, 24x7 fund transfers through banks and mobile channels.\n\nUnlike NEFT or RTGS, IMPS works even on holidays, enabling seamless person-to-person and person-to-merchant payments.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "UPI – Unified Payments Interface",
+                    "content": "UPI revolutionized retail payments by allowing real-time fund transfers via mobile apps using a Virtual Payment Address (VPA).\n\nIt combines IMPS infrastructure with a simple user experience — QR codes, phone numbers, and handles like @oksbi.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Clearing and Settlement",
+                    "content": "Clearing refers to the exchange of payment instructions between banks, while settlement is the actual transfer of funds.\n\nSystems like RTGS provide real-time settlement, whereas NEFT and cheque clearing use net settlement cycles.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Role of NPCI",
+                    "content": "The National Payments Corporation of India (NPCI) operates major retail payment systems — UPI, IMPS, RuPay, and AePS.\n\nNPCI ensures interoperability, standardization, and innovation across India’s digital payments ecosystem.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Security & Compliance",
+                    "content": "All payment systems must comply with RBI guidelines, PCI-DSS standards, and strong authentication (2FA).\n\nBanks use encryption, fraud monitoring, and transaction limits to safeguard users and prevent misuse.",
+                    "isViewed": false
+                  },
+                  {
+                    "title": "Future Trends in Payments",
+                    "content": "Emerging areas include CBDCs (Central Bank Digital Currency), tokenization, AI-driven fraud detection, and cross-border UPI links.\n\nThe focus is on interoperability, instant settlement, and embedded finance experiences.",
+                    "isViewed": false
+                  }
+                ]
+              }
+            ]
         ]
     },
     {

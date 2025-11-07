@@ -11,6 +11,8 @@ internal import Combine
 struct ExploreView: View {
     @State private var searchText: String = ""
     @StateObject private var viewModel = LearningCardsViewModel()
+    @EnvironmentObject private var roleStore: RoleStore
+
 
     private var filteredResumeLearning: [ExploreCard] {
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -115,7 +117,7 @@ struct ExploreView: View {
                 }
             }
             .onAppear {
-                viewModel.loadData()
+                viewModel.loadData(role: roleStore.current)
             }
             .ignoresSafeArea(edges: .top)
             .toolbar(.hidden, for: .navigationBar)
@@ -123,7 +125,26 @@ struct ExploreView: View {
     }
 
     private func convertToLearningCardModel(_ card: ExploreCard) -> LearningCardModel {
-        LearningCardModel(id: UUID(), title: card.title, description: card.description, imageName: card.imageName, learnCards: [])
+        // If this ExploreCard corresponds to the GENAI & ML topic, build learn cards from the provided content
+        let lowerTitle = card.title.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        let cardsToUse: [LearnCard]
+        if lowerTitle.contains("genai") || lowerTitle.contains("ml") || lowerTitle.contains("machine learning") || lowerTitle.contains("generative ai") {
+            cardsToUse = ExploreLearningCardsData.genAIAndMLCards
+        } else {
+            // Fallback to the card's existing learnCards, ensuring isViewed is present/false by default
+            cardsToUse = card.learnCards.isEmpty ? [] : card.learnCards.map { existing in
+                LearnCard(title: existing.title, content: existing.content, isViewed: false)
+            }
+        }
+
+        return LearningCardModel(
+            id: UUID(),
+            title: card.title,
+            description: card.description,
+            imageName: card.imageName,
+            learnCards: cardsToUse
+        )
     }
 }
 
@@ -131,15 +152,15 @@ struct ExploreView: View {
 class LearningCardsViewModel: ObservableObject {
     @Published var learningCardsData: ExploreLearningCardsData?
 
-    func loadData() {
+    func loadData(role: Role) {
         // Load from JSON file or API
         if let jsonPath = Bundle.main.path(forResource: "learning_cards", ofType: "json"),
            let jsonData = try? Data(contentsOf: URL(fileURLWithPath: jsonPath)) {
-            loadFromJSON(jsonData)
+            loadFromJSON(jsonData, role: role)
         }
     }
 
-    func loadFromJSON(_ jsonData: Data) {
+    func loadFromJSON(_ jsonData: Data, role: Role) {
         do {
             if let jsonArray = try JSONSerialization.jsonObject(with: jsonData) as? [[String: Any]] {
                 var resumeLearning: [ExploreCard] = []
@@ -158,7 +179,8 @@ class LearningCardsViewModel: ObservableObject {
                     }
                 }
 
-                self.learningCardsData = ExploreLearningCardsData(resumeLearning: resumeLearning, bookmarked: bookmarked, topics: topics)
+//                self.learningCardsData = ExploreLearningCardsData(resumeLearning: resumeLearning, bookmarked: bookmarked, topics: topics)
+                self.learningCardsData = role == .developer ? ExploreLearningCardsData.sample : ExploreLearningCardsData.operationsDataSample
             }
         } catch {
             print("Error decoding JSON: \(error.localizedDescription)")
@@ -208,7 +230,7 @@ struct TopicLargeCard: View {
             Text(description)
                 .font(.caption)
                 .foregroundStyle(.secondary)
-                .lineLimit(2)
+                .lineLimit(1)
                 .truncationMode(.tail)
                 .multilineTextAlignment(.leading)
         }
@@ -225,6 +247,7 @@ struct ResumeCard: View {
                 .resizable()
                 .cornerRadius(8)
                 .frame(width: 220, height: 120)
+                .padding()
             VStack(alignment: .leading, spacing: 8) {
                 Text(card.title)
                     .font(.subheadline).bold()
@@ -310,6 +333,7 @@ struct ExploreView1: View {
 struct ExploreView_Previews: PreviewProvider {
     static var previews: some View {
         ExploreView()
+            .environmentObject(RoleStore())
     }
 }
 

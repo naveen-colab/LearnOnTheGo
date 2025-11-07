@@ -1,0 +1,202 @@
+{
+  "roles": [
+    {
+      "role": "Developer",
+      "headerSubtitle": "Based on your Jira today: TASK-123 LLM Rag pipeline fix, TASK-342 MCP server crash. Recommended learnings below.",
+      "recommended": [
+        {
+          "title": "Mastering MCP Servers",
+          "description": "Build Reliable Infrastructure",
+          "imageName": "RecommendedImage1",
+          "learnCards": [
+            {
+              "title": "What Is an MCP Server?",
+              "content": "A Model Context Protocol (MCP) server is a stateless service that exposes tools, data sources, and workflows to AI agents via a standard schema.\n\nThink of it as a well-typed API layer that lets agents call functions, fetch context, and perform actions reliably.",
+              "isViewed": false
+            },
+            {
+              "title": "Core Building Blocks",
+              "content": "Typical MCP servers include:\n * Endpoints: Typed operations the agent can call (e.g., search, summarize, transform).\n * Schemas: JSON-serializable request/response contracts for stability.\n * Auth: Tokens or mTLS to protect sensitive tools.\n * Observability: Logs, metrics, and traces for reliability.",
+              "isViewed": false
+            },
+            {
+              "title": "Designing Reliable Endpoints",
+              "content": "Make endpoints deterministic and idempotent where possible.\n\nUse strict validation on inputs, version your schemas, and return actionable error codes. Prefer small, composable operations over mega-endpoints.",
+              "isViewed": false
+            },
+            {
+              "title": "Error Handling that Scales",
+              "content": "Adopt a clear error taxonomy:\n * 4xx: Caller/input issues (validation, auth, rate limit)\n * 5xx: Server/transient issues (timeouts, upstream failures)\n\nReturn remediation hints and retry-after guidance. Include correlation IDs in every response.",
+              "isViewed": false
+            },
+            {
+              "title": "Observability & SLOs",
+              "content": "Track p50/p95 latency, success rate, and error classes per endpoint.\n\nSet SLOs (e.g., 99.9% success, p95 < 300ms) and alert on burn rate. Add structured logs with request IDs and minimal PII.",
+              "isViewed": false
+            },
+            {
+              "title": "Security Essentials",
+              "content": "Use least-privilege for every tool. Rotate credentials, enforce TLS, and validate all inputs.\n\nRedact secrets in logs. Add abuse throttles and anomaly detection for suspicious agent behavior.",
+              "isViewed": false
+            },
+            {
+              "title": "Versioning Without Pain",
+              "content": "Version your contracts (v1, v2) and support a deprecation window.\n\nPrefer additive changes, guard behind feature flags, and publish migration guides for clients and agents.",
+              "isViewed": false
+            },
+            {
+              "title": "Performance Tuning",
+              "content": "Cache hot reads, batch small requests, and stream large responses.\n\nUse connection pooling and backpressure. Profile hotspots regularly; optimize serialization and DB queries first.",
+              "isViewed": false
+            },
+            {
+              "title": "Testing Strategy",
+              "content": "Combine contract tests, golden samples, chaos testing, and load tests.\n\nMock upstream dependencies; validate schema compatibility on every CI run. Record/replay real traffic (sanitized) to catch regressions.",
+              "isViewed": false
+            },
+            {
+              "title": "Operational Playbooks",
+              "content": "Create runbooks for incidents: timeouts, elevated 5xx, dependency outages.\n\nInclude rollback/feature flag steps, on-call escalation, and communication templates for stakeholders.",
+              "isViewed": false
+            }
+          ]
+        },
+        {
+          "title": "Unlocking RAG",
+          "description": ": AI-Powered Knowledge Retrieval",
+          "imageName": "RecommendedImage2",
+          "learnCards": [
+              {
+                "title": "Meet RAG: AI's Smartest Upgrade",
+                "content": "Retrieval-Augmented Generation (RAG) combines two AI skills — retrieval (finding facts) and generation (creating answers).\n\nIt fetches the latest info before writing, keeping responses fresh, accurate, and relevant.",
+                "isViewed": false
+              },
+              {
+                "title": "How RAG Works in 3 Steps",
+                "content": "Your Question → You ask something.\nFact Hunt → RAG searches databases, articles, or documents.\nSmart Answer → AI weaves the facts into a tailored, natural-sounding reply.\n\nThink of it as asking a librarian who also happens to be a skilled writer!",
+                "isViewed": false
+              },
+              {
+                "title": "Why RAG Beats Plain AI",
+                "content": "Without retrieval, AI relies only on what it was trained on — which can be stale.\nWith RAG, you get:\n * Up-to-date info\n * Reduced hallucinations (AI making stuff up)\n * Higher accuracy for decision-making.\n * It’s like GPS navigation that always checks live traffic before giving you directions.",
+                "isViewed": false
+              },
+              {
+                "title": "Where RAG Shines",
+                "content": "RAG is perfect for:\n * Research & reports\n * Customer support\n * Legal & compliance queries\n * Medical info lookup\n * Basically, anywhere accuracy and context matter most.",
+                "isViewed": false
+              },
+              {
+                "title": "The Bottom Line",
+                "content": "RAG = AI with a fact-checker in its pocket.\n\nBy fetching real-time info before answering, it delivers responses that are factual, current, and relevant — so you can trust what you read.",
+                "isViewed": false
+              }
+          ]
+        }
+      ],
+      "topics": [
+        { "title": "Cloud Computing", "symbol": "cloud.fill", "image": "TechTopic1" },
+        { "title": "Agentic RAG", "symbol": "atom", "image": "TechTopic2" }
+      ]
+    },
+    {
+      "role": "Operations",
+      "headerSubtitle": "Personalized based on your current work",
+      "recommended": [
+        {
+          "title": "Credit Card Operations",
+          "description": "",
+          "imageName": "OperationsImage1",
+          "learnCards": [
+              {
+                "title": "Application Review & Approval",
+                "content": "Banks assess an applicant’s credit history, income, and identity before issuing a card.\n\nKey check: KYC (Know Your Customer) ensures legal compliance and fraud prevention.\n\nAdvanced fraud detection tools may flag high-risk applications for manual review.",
+                "isViewed": false
+              },
+              {
+                "title": "Setting the Credit Limit",
+                "content": "A customer’s credit score and repayment capacity determine their limit.\n\nHigher limits may require additional verification or secured deposits.\n\nLimits are periodically reviewed and adjusted based on usage and payment behavior.",
+                "isViewed": false
+              },
+              {
+                "title": "Approving Purchases in Real Time",
+                "content": "Each transaction is routed through the payment network to verify funds, available credit, and potential fraud flags — all within seconds.\n\nGeo-location checks and spending pattern analysis help detect unusual activity.",
+                "isViewed": false
+              },
+              {
+                "title": "Monthly Statements & Due Dates",
+                "content": "Banks send detailed statements showing purchases, fees, and the minimum amount due.\n\nTimely payment avoids interest charges and late fees.\n\nDigital delivery through apps and email helps customers track spending in real time.",
+                "isViewed": false
+              },
+              {
+                "title": "Handling Customer Disputes",
+                "content": "If a customer reports an unauthorized charge, the bank investigates, issues a temporary credit, and works with the merchant to resolve the case.\n\nResolution timelines vary by network but typically range from 30–90 days.",
+                "isViewed": false
+              }
+            ]
+        },
+        {
+          "title": "Payments Systems",
+          "description": "",
+          "imageName": "OperationsImage2",
+          "learnCards": [
+            {
+              "title": "What Are Payment Systems?",
+              "content": "Payment systems are networks and processes that enable the transfer of money between individuals, businesses, and financial institutions.\n\nThey form the backbone of banking operations — ensuring secure, timely, and traceable settlement of funds.",
+              "isViewed": false
+            },
+            {
+              "title": "Types of Payment Systems",
+              "content": "Banking operations rely on multiple payment rails:\n * RTGS: Real-time settlement for high-value transactions.\n * NEFT: Batch-based fund transfers processed in half-hourly cycles.\n * IMPS: Instant 24x7 retail transfers.\n * UPI: Unified Payments Interface for mobile and QR-based instant payments.",
+              "isViewed": false
+            },
+            {
+              "title": "RTGS – Real Time Gross Settlement",
+              "content": "Used for large-value transfers (≥ ₹2 lakh) settled instantly on a one-to-one basis.\n\nRTGS ensures final and irrevocable settlement, typically used by corporates, banks, and institutions for high-value clearing.",
+              "isViewed": false
+            },
+            {
+              "title": "NEFT – National Electronic Funds Transfer",
+              "content": "NEFT operates on a deferred net settlement model, processing transactions in batches every 30 minutes.\n\nIt’s ideal for retail and business payments where instant settlement isn’t critical.",
+              "isViewed": false
+            },
+            {
+              "title": "IMPS – Immediate Payment Service",
+              "content": "IMPS provides instant, 24x7 fund transfers through banks and mobile channels.\n\nUnlike NEFT or RTGS, IMPS works even on holidays, enabling seamless person-to-person and person-to-merchant payments.",
+              "isViewed": false
+            },
+            {
+              "title": "UPI – Unified Payments Interface",
+              "content": "UPI revolutionized retail payments by allowing real-time fund transfers via mobile apps using a Virtual Payment Address (VPA).\n\nIt combines IMPS infrastructure with a simple user experience — QR codes, phone numbers, and handles like @oksbi.",
+              "isViewed": false
+            },
+            {
+              "title": "Clearing and Settlement",
+              "content": "Clearing refers to the exchange of payment instructions between banks, while settlement is the actual transfer of funds.\n\nSystems like RTGS provide real-time settlement, whereas NEFT and cheque clearing use net settlement cycles.",
+              "isViewed": false
+            },
+            {
+              "title": "Role of NPCI",
+              "content": "The National Payments Corporation of India (NPCI) operates major retail payment systems — UPI, IMPS, RuPay, and AePS.\n\nNPCI ensures interoperability, standardization, and innovation across India’s digital payments ecosystem.",
+              "isViewed": false
+            },
+            {
+              "title": "Security & Compliance",
+              "content": "All payment systems must comply with RBI guidelines, PCI-DSS standards, and strong authentication (2FA).\n\nBanks use encryption, fraud monitoring, and transaction limits to safeguard users and prevent misuse.",
+              "isViewed": false
+            },
+            {
+              "title": "Future Trends in Payments",
+              "content": "Emerging areas include CBDCs (Central Bank Digital Currency), tokenization, AI-driven fraud detection, and cross-border UPI links.\n\nThe focus is on interoperability, instant settlement, and embedded finance experiences.",
+              "isViewed": false
+            }
+          ]
+        }
+      ],
+      "topics": [
+        { "title": "Compliance Norms", "symbol": "shield.fill", "image": "OpsTopic1" },
+        { "title": "Risk & Controls", "symbol": "magnifyingglass", "image": "OpsTopic2" }
+      ]
+    }
+  ]
+}
