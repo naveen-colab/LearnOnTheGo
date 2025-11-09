@@ -2,295 +2,240 @@ import SwiftUI
 import AVFoundation
 
 struct PlayLearningCardScreen: View {
-    // Expect a model that contains multiple learnCard to play
+    // Reuse existing model for artwork/title, but we'll play a single audio file
     @State var model: LearningCardModel
+
+    // New: pass in the audio file name (without or with extension). We'll resolve mp3 in bundle.
+    var audioFileName: String? = nil
 
     // Playback state
     @State private var isPlaying: Bool = false
-    @State private var currentIndex: Int = 0 {
-        didSet {
-            print("currentIndex: \(currentIndex)")
-        }
-    }
-    @State private var spokenIndices: Set<Int> = []
-    @State private var speechSynth: AVSpeechSynthesizer = AVSpeechSynthesizer()
-    @State private var speechDelegate: SpeechDelegate? = nil
-    @State private var utteranceProgress: Double = 0 // 0..1 progress within current card
-    
-    @State private var elapsedSeconds: Double = 0
-    @State private var totalSeconds: Double = 0
+    @State private var currentTime: TimeInterval = 0
+    @State private var duration: TimeInterval = 0
 
-    // Derived progress based on how many learnCard have been spoken
+    // AVAudioPlayer for mp3 playback
+    @State private var audioPlayer: AVAudioPlayer?
+
+    // Timer for updating progress
+    @State private var displayLink: CADisplayLink? = nil
+
     private var progress: Double {
-        guard totalSeconds > 0 else { return 0 }
-        return min(max(elapsedSeconds / totalSeconds, 0), 1)
-    }
-
-    private var currentCard: LearnCard? {
-        guard model.learnCards.indices.contains(currentIndex) else { return nil }
-        return model.learnCards[currentIndex]
+        guard duration > 0 else { return 0 }
+        return min(max(currentTime / duration, 0), 1)
     }
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(spacing: 20) {
-                // Image in rounded rectangle container
+                // Podcast artwork
                 Image(model.imageName)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(height: 180)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .padding()
+                    .aspectRatio(1, contentMode: .fit)
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .shadow(radius: 8)
+                    .padding(.top, 24)
 
-                // Title centered, bold, slightly larger font
-                Text(model.title)
-                    .font(.title2.bold())
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                // Title & description
+                VStack(spacing: 8) {
+                    Text(model.title)
+                        .font(.title2.bold())
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+                    if !model.description.isEmpty {
+                        Text(model.description)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                }
 
-                // Subtitle line shows how many learnCard and progress count
-                Text("Episode • \(model.learnCards.count) Cards")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-
-                // Progress row
+                // Time labels
                 HStack {
-                    Image(systemName: "gauge")
+                    Text(currentTime.mmss)
+                        .font(.caption.monospacedDigit())
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("\(TimeInterval(elapsedSeconds).mmss) / \(TimeInterval(totalSeconds).mmss)")
-                        .font(.subheadline.monospacedDigit())
+                    Text(duration.mmss)
+                        .font(.caption.monospacedDigit())
                         .foregroundColor(.secondary)
                 }
                 .padding(.horizontal)
 
-                ProgressView(value: progress, total: 1)
-                    .tint(.red)
-                    .padding(.horizontal)
+                // Progress / seek
+                Slider(value: Binding(
+                    get: { progress },
+                    set: { newValue in
+                        seek(toProgress: newValue)
+                    }
+                ), in: 0...1)
+                .tint(.red)
+                .padding(.horizontal)
 
                 // Transport controls
                 HStack(spacing: 60) {
                     Button {
-                        stepBackward()
+                        skip(seconds: -15)
                     } label: {
-                        Image(systemName: "backward.fill")
-                            .font(.title2)
-                            .foregroundColor(.primary)
+                        VStack {
+                            Image(systemName: "gobackward.15")
+                                .font(.title2)
+                            Text("-15s").font(.caption2)
+                        }
+                        .foregroundColor(.primary)
                     }
+
                     Button {
                         togglePlayPause()
                     } label: {
                         Image(systemName: isPlaying ? "pause.fill" : "play.fill")
                             .font(.title2)
                             .foregroundColor(.white)
-                            .frame(width: 56, height: 56)
+                            .frame(width: 64, height: 64)
                             .background(Circle().fill(Color.red))
                     }
+
                     Button {
-                        stepForward()
+                        skip(seconds: 30)
                     } label: {
-                        Image(systemName: "forward.fill")
-                            .font(.title2)
-                            .foregroundColor(.primary)
+                        VStack {
+                            Image(systemName: "goforward.30")
+                                .font(.title2)
+                            Text("+30s").font(.caption2)
+                        }
+                        .foregroundColor(.primary)
                     }
                 }
                 .padding(.vertical)
 
-                // Transcript section (show current card content and upcoming)
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Transcript")
-                        .font(.headline)
-                        .padding(.bottom, 4)
-
-                    if model.learnCards.isEmpty {
-                        Text("No content available.")
-                            .foregroundColor(.secondary)
-                    } else {
-                        ForEach(model.learnCards.indices, id: \.self) { idx in
-                            let text = model.learnCards[idx].content
-                            Text(text)
-                                .font(.body)
-                                .foregroundColor(color(for: idx))
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 40)
+                // Remove transcript section as requested
+                Spacer(minLength: 20)
             }
             .frame(maxWidth: .infinity)
-            .navigationTitle("Now playing")
+            .navigationTitle("Now Playing")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.red, for: .navigationBar)
             .toolbarBackgroundVisibility(.visible, for: .navigationBar)
         }
         .onAppear {
-            configureSpeech()
-            recalculateTotalDuration()
+            configureAudioSession()
+            prepareAndLoadAudio()
+            startDisplayLink()
         }
-        .onDisappear { stopSpeaking() }
+        .onDisappear {
+            stopPlayback()
+            stopDisplayLink()
+        }
     }
 }
 
-// MARK: - Playback helpers
+// MARK: - Audio setup & controls
 private extension PlayLearningCardScreen {
-    func configureSpeech() {
-        let delegate = SpeechDelegate(
-            onDidFinish: { finished in
-                if finished {
-                    advanceAfterFinish()
-                }
-            },
-            onWillSpeakRange: { range, fullString in
-                let totalLength = max(fullString.count, 1)
-                let spokenUpTo = min(range.location + range.length, totalLength)
-                utteranceProgress = Double(spokenUpTo) / Double(totalLength)
-                refreshElapsed()
+    func configureAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.allowBluetooth, .allowAirPlay])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("AudioSession error: \(error)")
+        }
+    }
+
+    func prepareAndLoadAudio() {
+        // Determine file name: prefer provided audioFileName, else infer from model.title if it matches provided assets
+        let fileName: String
+        if let explicit = audioFileName, !explicit.isEmpty {
+            fileName = explicit
+        } else {
+            // Fallback: map some known titles to files
+            let lower = model.title.lowercased()
+            if lower.contains("taming") {
+                fileName = "Taming_OpenShift"
+            } else {
+                fileName = "OpenShift"
             }
-        )
-        speechDelegate = delegate
-        speechSynth.delegate = delegate
-        recalculateTotalDuration()
+        }
+
+        // Accept either with or without extension
+        let baseName = (fileName as NSString).deletingPathExtension
+        let ext = (fileName as NSString).pathExtension.isEmpty ? "mp3" : (fileName as NSString).pathExtension
+
+        guard let url = Bundle.main.url(forResource: baseName, withExtension: ext) else {
+            print("Audio file not found: \(baseName).\(ext)")
+            return
+        }
+
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.prepareToPlay()
+            audioPlayer = player
+            duration = player.duration
+            currentTime = 0
+        } catch {
+            print("Failed to init AVAudioPlayer: \(error)")
+        }
     }
 
     func togglePlayPause() {
+        guard let player = audioPlayer else { return }
         if isPlaying {
-            pauseSpeaking()
+            player.pause()
             isPlaying = false
         } else {
-            if currentIndex == model.learnCards.count - 1 {
-                currentIndex = 0
-            }
-            startSpeakingIfNeeded()
+            player.play()
             isPlaying = true
         }
     }
 
-    func startSpeakingIfNeeded() {
-        guard let card = currentCard else { return }
-        if speechSynth.isPaused {
-            speechSynth.continueSpeaking()
-            isPlaying = true
-            return
-        }
-        if !speechSynth.isSpeaking {
-            utteranceProgress = 0
-            refreshElapsed()
-            speak(text: card.content)
-            isPlaying = true
-        }
+    func stopPlayback() {
+        audioPlayer?.stop()
+        isPlaying = false
+        currentTime = 0
     }
 
-    func pauseSpeaking() {
-        speechSynth.pauseSpeaking(at: .immediate)
+    func skip(seconds: TimeInterval) {
+        guard let player = audioPlayer else { return }
+        let newTime = min(max(player.currentTime + seconds, 0), player.duration)
+        player.currentTime = newTime
+        currentTime = newTime
+        if isPlaying { player.play() }
     }
 
-    func stopSpeaking() {
-        speechSynth.stopSpeaking(at: .immediate)
-    }
-
-    func speak(text: String) {
-        let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: Locale.current.identifier)
-        speechSynth.speak(utterance)
-    }
-
-    func advanceAfterFinish() {
-        // mark current as spoken
-        if model.learnCards.indices.contains(currentIndex) {
-            spokenIndices.insert(currentIndex)
-        }
-        // move to next
-        if currentIndex + 1 < model.learnCards.count {
-            currentIndex += 1
-            utteranceProgress = 0
-            refreshElapsed()
-            // Automatically continue to the next card if the user was playing
-            if isPlaying {
-                startSpeakingIfNeeded()
-            }
-        } else {
-            // finished all
-            isPlaying = false
-        }
-    }
-
-    func stepForward() {
-        let wasPlaying = isPlaying
-        stopSpeaking()
-        if currentIndex + 1 < model.learnCards.count {
-            currentIndex += 1
-            utteranceProgress = 0
-            refreshElapsed()
-        }
-        if wasPlaying {
-            startSpeakingIfNeeded()
-            isPlaying = true
-        }
-    }
-
-    func stepBackward() {
-        let wasPlaying = isPlaying
-        stopSpeaking()
-        if currentIndex - 1 >= 0 {
-            currentIndex -= 1
-            utteranceProgress = 0
-            refreshElapsed()
-        }
-        if wasPlaying {
-            startSpeakingIfNeeded()
-            isPlaying = true
-        }
-    }
-
-    func color(for index: Int) -> Color {
-        if index == currentIndex { return .red }
-        if index < currentIndex { return .secondary}
-        return .primary
-    }
-    
-    func recalculateTotalDuration() {
-        // Create a temporary utterance to read the rate used
-        let tempUtterance = AVSpeechUtterance(string: "")
-        // Use the current locale voice if set similarly to speak(_:) for consistency
-        tempUtterance.voice = AVSpeechSynthesisVoice(language: Locale.current.identifier)
-        let rate = tempUtterance.rate
-        totalSeconds = model.learnCards.map { $0.content.estimatedSpeechDuration(rate: rate) }.reduce(0, +)
-    }
-    
-    func elapsedTimeForCurrentState() -> Double {
-        guard !model.learnCards.isEmpty else { return 0 }
-        // Sum durations before currentIndex
-        let tempUtterance = AVSpeechUtterance(string: "")
-        tempUtterance.voice = AVSpeechSynthesisVoice(language: Locale.current.identifier)
-        let rate = tempUtterance.rate
-        let durations = model.learnCards.map { $0.content.estimatedSpeechDuration(rate: rate) }
-        let completed = durations.prefix(currentIndex).reduce(0, +)
-        let currentDuration = durations.indices.contains(currentIndex) ? durations[currentIndex] : 0
-        return completed + currentDuration * utteranceProgress.clamped(to: 0...1)
-    }
-    
-    func refreshElapsed() {
-        // Compute from current state; call this from places where state changes
-        elapsedSeconds = elapsedTimeForCurrentState()
+    func seek(toProgress newValue: Double) {
+        guard let player = audioPlayer, player.duration > 0 else { return }
+        let clamped = min(max(newValue, 0), 1)
+        let newTime = clamped * player.duration
+        player.currentTime = newTime
+        currentTime = newTime
+        if isPlaying { player.play() }
     }
 }
 
-private extension Double {
-    func clamped(to range: ClosedRange<Double>) -> Double {
-        return min(max(self, range.lowerBound), range.upperBound)
+// MARK: - Display link (progress updates)
+private extension PlayLearningCardScreen {
+    func startDisplayLink() {
+        let link = CADisplayLink(target: DisplayLinkProxy { [weak audioPlayer] in
+            guard let player = audioPlayer else { return }
+            self.currentTime = player.currentTime
+            self.duration = player.duration
+            if player.currentTime >= player.duration {
+                self.isPlaying = false
+            }
+        }, selector: #selector(DisplayLinkProxy.tick))
+        link.add(to: .main, forMode: .common)
+        displayLink = link
+    }
+
+    func stopDisplayLink() {
+        displayLink?.invalidate()
+        displayLink = nil
     }
 }
 
-private extension String {
-    /// Rough estimate of speech duration in seconds for a given rate.
-    func estimatedSpeechDuration(rate: Float) -> Double {
-        // Heuristic: words per minute derived from AVSpeechUtteranceDefaultSpeechRate
-        // Convert rate (0.0..1.0 roughly) to words per minute; use a baseline ~180 wpm at default rate.
-        let baselineWPM: Double = 180
-        let adjustedWPM = max(60.0, min(300.0, Double(rate) * 200 + 80))
-        let words = self.split{ $0.isWhitespace || $0.isNewline }.count
-        return Double(words) / (adjustedWPM / 60.0)
-    }
+private final class DisplayLinkProxy: NSObject {
+    let action: () -> Void
+    init(_ action: @escaping () -> Void) { self.action = action }
+    @objc func tick() { action() }
 }
 
 private extension TimeInterval {
@@ -302,30 +247,12 @@ private extension TimeInterval {
     }
 }
 
-// MARK: - AVSpeechSynthesizerDelegate bridge
-private final class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
-    private let onDidFinish: (Bool) -> Void
-    private let onWillSpeakRange: ((NSRange, String) -> Void)?
-
-    init(onDidFinish: @escaping (Bool) -> Void, onWillSpeakRange: ((NSRange, String) -> Void)? = nil) {
-        self.onDidFinish = onDidFinish
-        self.onWillSpeakRange = onWillSpeakRange
-    }
-
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        onDidFinish(true)
-    }
-
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
-        onWillSpeakRange?(characterRange, utterance.speechString)
-    }
-}
-
 // MARK: - Preview
 #Preview {
-    
     NavigationStack {
-        PlayLearningCardScreen(model: LearningCardModel(id: UUID(),title: "", description: "", imageName: "", learnCards: [LearnCard]()))
+        PlayLearningCardScreen(
+            model: LearningCardModel(id: UUID(), title: "OpenShift", description: "A podcast episode about OpenShift.", imageName: "", learnCards: []),
+            audioFileName: "OpenShift.mp3"
+        )
     }
 }
-

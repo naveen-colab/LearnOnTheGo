@@ -2,6 +2,7 @@ import SwiftUI
 
 struct PodcastsScreen: View {
     @State private var searchText: String = ""
+    @State private var playCount: Int = 0
 
     var body: some View {
         NavigationStack {
@@ -36,18 +37,24 @@ struct PodcastsScreen: View {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 14) {
                                 ForEach(MockPodcasts.keepListening) { item in
-                                    PodcastCard(item: item, size: .large)
+                                    NavigationLink(destination: PlayLearningCardScreen(
+                                        model: LearningCardModel(id: UUID(), title: item.title, description: "", imageName: item.image, learnCards: []),
+                                        audioFileName: upcomingAudioFileName()
+                                    )) {
+                                        PodcastCard(item: item, size: .large)
+                                    }
+                                    .simultaneousGesture(TapGesture().onEnded { playCount += 1 })
                                 }
                             }
                             .padding(.horizontal, 2)
                         }
 
                         // Categories
-                        CategorySection(title: "Artificial Intelligence & LLMs", items: MockPodcasts.ai)
-                        CategorySection(title: "Cybersecurity", items: MockPodcasts.security)
-                        CategorySection(title: "Data Engineering & Analytics", items: MockPodcasts.data)
-                        CategorySection(title: "Cloud Native Development", items: MockPodcasts.cloud)
-                        CategorySection(title: "Mobile App Development", items: MockPodcasts.mobile)
+                        CategorySection(title: "Artificial Intelligence & LLMs", items: MockPodcasts.ai, audioFileProvider: { _ in upcomingAudioFileName() })
+                        CategorySection(title: "Cybersecurity", items: MockPodcasts.security, audioFileProvider: { _ in upcomingAudioFileName() })
+                        CategorySection(title: "Data Engineering & Analytics", items: MockPodcasts.data, audioFileProvider: { _ in upcomingAudioFileName() })
+                        CategorySection(title: "Cloud Native Development", items: MockPodcasts.cloud, audioFileProvider: { _ in upcomingAudioFileName() })
+                        CategorySection(title: "Mobile App Development", items: MockPodcasts.mobile, audioFileProvider: { _ in upcomingAudioFileName() })
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 12)
@@ -57,11 +64,18 @@ struct PodcastsScreen: View {
             .toolbar(.hidden, for: .navigationBar)
         }
     }
+    
+    private func upcomingAudioFileName() -> String {
+        // Decide the next file without mutating state (odd -> Taming, even -> OpenShift)
+        let next = playCount + 1
+        return (next % 2 == 1) ? "Taming_OpenShift.mp3" : "OpenShift.mp3"
+    }
 }
 
 private struct CategorySection: View {
     let title: String
     let items: [PodcastItem]
+    let audioFileProvider: (PodcastItem) -> String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -70,7 +84,12 @@ private struct CategorySection: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 14) {
                     ForEach(items) { item in
-                        PodcastCard(item: item, size: .medium)
+                        NavigationLink(destination: PlayLearningCardScreen(
+                            model: LearningCardModel(id: UUID(), title: item.title, description: "", imageName: item.image, learnCards: []),
+                            audioFileName: audioFileProvider(item)
+                        )) {
+                            PodcastCard(item: item, size: .medium)
+                        }
                     }
                 }
                 .padding(.horizontal, 2)
@@ -99,6 +118,7 @@ private struct PodcastCard: View {
     enum Size { case large, medium }
     let item: PodcastItem
     let size: Size
+    var onTap: (() -> Void)? = nil
 
     var body: some View {
         VStack {
@@ -199,4 +219,3 @@ private enum MockPodcasts {
 #Preview {
     PodcastsScreen()
 }
-
