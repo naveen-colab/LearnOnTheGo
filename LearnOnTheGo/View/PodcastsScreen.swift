@@ -54,7 +54,7 @@ struct PodcastsScreen: View {
                         CategorySection(title: "Cybersecurity", items: MockPodcasts.security, audioFileProvider: { _ in upcomingAudioFileName() })
                         CategorySection(title: "Data Engineering & Analytics", items: MockPodcasts.data, audioFileProvider: { _ in upcomingAudioFileName() })
                         CategorySection(title: "Cloud Native Development", items: MockPodcasts.cloud, audioFileProvider: { _ in upcomingAudioFileName() })
-                        CategorySection(title: "Mobile App Development", items: MockPodcasts.mobile, audioFileProvider: { _ in upcomingAudioFileName() })
+//                        CategorySection(title: "Mobile App Development", items: MockPodcasts.mobile, audioFileProvider: { _ in upcomingAudioFileName() })
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 12)
@@ -127,31 +127,33 @@ private struct PodcastCard: View {
                 .cornerRadius(8)
                 .frame(width: 170, height: 130)
                 .scaledToFill()
-                .overlay(
-                    ZStack(alignment: .bottomLeading) {
-                        // Title overlay for mock artwork look
-                        VStack(alignment: .leading, spacing: 4) {
-                            Spacer()
-                            Text(item.artworkTitle)
-                                .font(.headline)
-                                .foregroundStyle(.white)
-                                .shadow(radius: 3)
-                                .padding([.horizontal, .bottom], 10)
-                        }
-                    }
-                )
-            VStack(alignment: .center, spacing: 8) {
+//                .overlay(
+//                    ZStack(alignment: .bottomLeading) {
+//                        // Title overlay for mock artwork look
+//                        VStack(alignment: .leading, spacing: 4) {
+//                            Spacer()
+//                            Text(item.artworkTitle)
+//                                .font(.headline)
+//                                .foregroundStyle(.white)
+//                                .shadow(radius: 3)
+//                                .padding([.horizontal, .bottom], 10)
+//                        }
+//                    }
+//                )
+                .padding()
+            VStack(alignment: .leading, spacing: 8) {
                 // Artwork placeholder
                 // Metadata
                 Text(item.title)
                     .font(.subheadline).bold()
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(.black)
                     .lineLimit(2)
-                    .multilineTextAlignment(.center)
+                    .multilineTextAlignment(.leading)
+                
                 HStack {
                     Text(item.duration)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.gray)
                     Spacer()
                     Circle()
                         .fill(Color(red: 1.0, green: 0.92, blue: 0.92))
@@ -160,7 +162,7 @@ private struct PodcastCard: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-//            .frame(width: 170, height: 216)
+            .frame(width: 170, height: 100)
             .padding(12)
         }
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
@@ -181,13 +183,13 @@ private struct PodcastItem: Identifiable {
 
 private enum MockPodcasts {
     static let keepListening: [PodcastItem] = [
-        .init(artworkTitle: "AI Today", title: "AI Today Podcast", duration: "15 min left", image: "keepListening1"),
-        .init(artworkTitle: "Cyber security", title: "Cyber security", duration: "15 min left", image: "keepListening2")
+        .init(artworkTitle: "OCP migration", title: "OCP migration", duration: "15 min left", image: "OCP migration"),
+        .init(artworkTitle: "Open shift fundamentals", title: "Open shift fundamentals", duration: "15 min left", image: "OCP basics")
     ]
 
     static let ai: [PodcastItem] = [
         .init(artworkTitle: "The Rise", title: "The Rise of Generative AI", duration: "12 min", image: "LLM1"),
-        .init(artworkTitle: "LLMs", title: "LLMs in Real World Apps", duration: "18 min", image: "LLM1"),
+//        .init(artworkTitle: "LLMs", title: "LLMs in Real World Apps", duration: "18 min", image: "LLM1"),
         .init(artworkTitle: "Ethics", title: "Ethical AI Decision Making", duration: "15 min", image: "LLM3")
     ]
 
